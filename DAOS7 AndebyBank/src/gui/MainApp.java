@@ -1,6 +1,7 @@
 package gui;
 
 import java.beans.EventHandler;
+import java.math.BigInteger;
 import java.util.Random;
 
 import storage.Storage;
@@ -50,7 +51,7 @@ public class MainApp extends Application {
 	private ToggleGroup tggKontotype;
 	private RadioButton rbnLøn, rbnPrioritet;
 	private Button btnOpretKunde, btnOpretKonto;
-	private Label lblError;
+	private Label lblErrorOpretKunde, lblErrorOpretKonto;
 
 	private void initContent(GridPane pane) {
 		pane.setPadding(new Insets(10));
@@ -163,7 +164,6 @@ public class MainApp extends Application {
 
 		// OPRET KNAPPER
 		HBox hbxOpret = new HBox();
-		hbxOpret.setPadding(new Insets(20, 0, 0, 0));
 
 		btnOpretKunde = new Button("Opret Kunde");
 		hbxOpret.getChildren().add(btnOpretKunde);
@@ -174,46 +174,110 @@ public class MainApp extends Application {
 		btnOpretKonto.setOnAction(e -> opretKontoAction());
 
 		hbxOpret.setSpacing(10);
-		pane.add(hbxOpret, 0, 11, 2, 1);
+		pane.add(hbxOpret, 0, 12, 2, 1);
 
-		// FEJLBESKED
-		lblError = new Label();
-		lblError.setTextFill(Color.RED);
-		pane.add(lblError, 0, 4, 2, 1);
+		// FEJLBESKEDER
+		lblErrorOpretKunde = new Label();
+		lblErrorOpretKunde.setTextFill(Color.RED);
+		pane.add(lblErrorOpretKunde, 0, 4, 2, 1);
+
+		lblErrorOpretKonto = new Label();
+		lblErrorOpretKonto.setTextFill(Color.RED);
+		pane.add(lblErrorOpretKonto, 0, 11, 2, 1);
 	}
 
 	private void opretKontoAction() {
+		lblErrorOpretKonto.setTextFill(Color.RED);
+
+		String cprNummer = checkCprNummer(lblErrorOpretKonto);
+		String kontotekst = txfKontotekst.getText().trim();
+		boolean løn = rbnLøn.isSelected() ? true : false;
+		boolean prioritet = rbnPrioritet.isSelected() ? true : false;
+
+		double saldo = -1;
+		try {
+			String temp = txfSaldo.getText().trim();
+			saldo = temp.length() == 0 ? 0 : Double.parseDouble(temp);
+		} catch (Exception e) {
+			lblErrorOpretKonto.setText("Ugyldig saldo.");
+		}
+
+		double låneret = -1;
+		try {
+			String temp = txfLåneret.getText().trim();
+			låneret = temp.length() == 0 ? 0 : Double.parseDouble(temp);
+		} catch (Exception e) {
+			lblErrorOpretKonto.setText("Ugyldig saldo.");
+		}
+
+		int regNummer = -1;
+		try {
+			String temp = txfRegNr.getText().trim();
+			regNummer = Integer.parseInt(temp);
+		} catch (Exception e) {
+			lblErrorOpretKonto.setText("Ugyldig reg. nummer.");
+		}
+
+		long kontonummer = -1;
+		try {
+			String temp = txfKontonummer.getText().trim();
+			kontonummer = Long.parseLong(temp);
+		} catch (Exception e) {
+			lblErrorOpretKonto.setText("Ugyldig kontonummer.");
+		}
+
+		if (cprNummer.length() != 10) {
+			lblErrorOpretKonto.setText("Ugyldigt CPR-nummer.");
+		} else if (!Storage.findesKunde(cprNummer)) {
+			lblErrorOpretKonto.setText("Kunde findes ikke.");
+		} else if (!Storage.findesAfdelig(regNummer)) {
+			lblErrorOpretKonto.setText("Afdeling findes ikke (indtast et andet reg. nummer).");
+		} else if (Storage.findesKontoIAfdeling(regNummer, kontonummer)) {
+			lblErrorOpretKonto.setText("Der findes allerede en konto med dette kontonummer i denne afdeling.");
+		} else {
+			Storage.opretKonto(cprNummer, regNummer, kontonummer, kontotekst, saldo, løn, prioritet, låneret);
+			lblErrorOpretKonto.setTextFill(Color.BLACK);
+			lblErrorOpretKonto.setText("Kunde blev oprettet succesfuldt.");
+		}
+		lblErrorOpretKunde.setText("");
+
 	}
 
 	private void opretKundeAction() {
-		String cprNummer = txfCprNr.getText();
+		lblErrorOpretKunde.setTextFill(Color.RED);
+
+		String cprNummer = checkCprNummer(lblErrorOpretKunde);
 		String navn = txfNavn.getText().trim();
 		String adresse = txfAdresse.getText().trim();
-		int postNr = 0;
+		int postNr = -1;
 		try {
 			postNr = Integer.parseInt(txfPostNr.getText().trim());
 		} catch (Exception e) {
 		}
 
-		lblError.setTextFill(Color.RED);
+		if (cprNummer.length() != 10) {
+			lblErrorOpretKunde.setText("Ugyldigt CPR-nummer.");
+		} else if (txfBynavn.getText().equals("")) {
+			lblErrorOpretKunde.setText("Ugyldigt postnummer.");
+		} else if (Storage.findesKunde(cprNummer)) {
+			lblErrorOpretKunde.setText("Kunde findes allerede.");
+		} else {
+			Storage.opretKunde(cprNummer, navn, adresse, postNr);
+			lblErrorOpretKunde.setTextFill(Color.BLACK);
+			lblErrorOpretKunde.setText("Kunde blev oprettet succesfuldt.");
+		}
+		lblErrorOpretKonto.setText("");
+	}
 
+	private String checkCprNummer(Label label) {
+		String cprNummer = txfCprNr.getText().trim();
 		try {
 			Integer.parseInt(cprNummer);
 		} catch (Exception e) {
-			lblError.setText("Ugyldigt CPR-nummer.");
+			label.setText("Ugyldigt CPR-nummer.");
+			return "";
 		}
+		return cprNummer;
 
-		if (cprNummer.length() != 10) {
-			lblError.setText("Ugyldigt CPR-nummer.");
-		} else if (txfBynavn.getText().equals("")) {
-			lblError.setText("Ugyldigt postnummer.");
-		} else if (Storage.findesKunde(cprNummer)) {
-			lblError.setText("Kunde findes allerede.");
-		} else {
-			Storage.opretKunde(cprNummer, navn, adresse, postNr);
-			lblError.setTextFill(Color.BLACK);
-			lblError.setText("Kunde blev oprettet succesfuldt.");
-
-		}
 	}
 }
