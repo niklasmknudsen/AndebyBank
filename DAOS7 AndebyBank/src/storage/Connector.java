@@ -11,7 +11,7 @@ import org.w3c.dom.Document;
 
 public class Connector {
 	private static String getUser() throws Exception {
-		File file = new File("auth.xml");
+		File file = new File("src//storage//auth.xml");
 		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
 		Document document = documentBuilder.parse(file);
@@ -19,7 +19,7 @@ public class Connector {
 	}
 
 	private static String getPass() throws Exception {
-		File file = new File("auth.xml");
+		File file = new File("src//storage//auth.xml");
 		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
 		Document document = documentBuilder.parse(file);
@@ -27,7 +27,7 @@ public class Connector {
 	}
 
 	private static String getAddr() throws Exception {
-		File file = new File("auth.xml");
+		File file = new File("src//storage//auth.xml");
 		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
 		Document document = documentBuilder.parse(file);
