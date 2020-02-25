@@ -9,8 +9,6 @@ public class Bank {
 		try {
 			Connection myConnection = Connector.getConnection();
 
-			//			myConnection = DriverManager.getConnection(
-			//					"jdbc:sqlserver://localhost;databaseName=Bank;username=sa;password=anton12895");
 			Statement myStatement = myConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,
 					ResultSet.CONCUR_UPDATABLE);
 			ResultSet res = myStatement.executeQuery("SELECT * FROM afdeling");
