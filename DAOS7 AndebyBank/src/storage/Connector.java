@@ -34,7 +34,7 @@ public class Connector {
 		return document.getElementsByTagName("address").item(0).getTextContent();
 	}
 
-	private static Connection getConnection() {
+	public static Connection getConnection() {
 		Connection c = null;
 		try {
 			c = DriverManager.getConnection("jdbc:sqlserver://" + getAddr() + ";databaseName=AndeByBank;user="
