@@ -30,4 +30,25 @@ public class Storage {
 			System.out.println("Error: " + e.getMessage());
 		}
 	}
+
+	public String getBynavn(int postNr) {
+		try {
+			ResultSet res = myStatement.executeQuery("select bynavn from PostDistrikt"
+					+ " where postNr = " + postNr + ";");
+			res.next();
+			return res.getString("bynavn");
+		} catch (SQLException e) {
+			return "";
+		}
+	}
+
+	public boolean findesKunde(String cprNummer) {
+		try {
+			ResultSet res = myStatement.executeQuery("select cprNr from Kunde"
+					+ " where cprNr = '" + cprNummer + "';");
+			return res.next();
+		} catch (SQLException e) {
+			return false;
+		}
+	}
 }
