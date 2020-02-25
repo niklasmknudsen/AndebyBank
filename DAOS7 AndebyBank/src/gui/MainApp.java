@@ -45,7 +45,6 @@ public class MainApp extends Application {
 	}
 
 	// -----------------------------------------------
-	private Storage storage = new Storage();
 	private TextField txfCprNr, txfNavn, txfAdresse, txfPostNr, txfBynavn, txfRegNr, txfKontonummer, txfKontotekst,
 			txfSaldo, txfLåneret;
 	private ToggleGroup tggKontotype;
@@ -85,7 +84,7 @@ public class MainApp extends Application {
 			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
 				try {
 					int postNr = Integer.parseInt(newValue.trim());
-					txfBynavn.setText(storage.getBynavn(postNr));
+					txfBynavn.setText(Storage.getBynavn(postNr));
 				} catch (Exception e) {
 					txfBynavn.setText("");
 				}
@@ -208,10 +207,10 @@ public class MainApp extends Application {
 			lblError.setText("Ugyldigt CPR-nummer.");
 		} else if (txfBynavn.getText().equals("")) {
 			lblError.setText("Ugyldigt postnummer.");
-		} else if (storage.findesKunde(cprNummer)) {
+		} else if (Storage.findesKunde(cprNummer)) {
 			lblError.setText("Kunde findes allerede.");
 		} else {
-			storage.opretKunde(cprNummer, navn, adresse, postNr);
+			Storage.opretKunde(cprNummer, navn, adresse, postNr);
 			lblError.setTextFill(Color.BLACK);
 			lblError.setText("Kunde blev oprettet succesfuldt.");
 
