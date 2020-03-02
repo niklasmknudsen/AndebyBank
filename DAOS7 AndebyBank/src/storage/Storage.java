@@ -1,6 +1,10 @@
 package storage;
 
 import java.sql.Statement;
+
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -98,6 +102,43 @@ public class Storage {
 			return res.next();
 		} catch (SQLException e) {
 			return false;
+		}
+	}
+
+	public static void sletKunde(String cprNummer) {
+		try (Connection myConnection = Connector.getConnection()) {
+			// TODO - Mangler trigger	
+
+		} catch (SQLException e) {
+
+		}
+
+	}
+
+	public static void visTransaktioner() {
+		try (Connection myConnection = Connector.getConnection()) {
+			// TODO - Mangler stored procedure	
+
+		} catch (SQLException e) {
+
+		}
+	}
+
+	public static void visAfdelinger() {
+		try (Connection myConnection = Connector.getConnection()) {
+			// TODO - Mangler stored procedure	
+
+		} catch (SQLException e) {
+
+		}
+	}
+
+	public static void visKonti() {
+		try (Connection myConnection = Connector.getConnection()) {
+			// TODO - Mangler view
+
+		} catch (SQLException e) {
+
 		}
 	}
 }

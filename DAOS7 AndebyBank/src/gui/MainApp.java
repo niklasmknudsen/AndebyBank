@@ -22,6 +22,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.ToggleGroup;
+import javafx.geometry.Pos;
 
 public class MainApp extends Application {
 
@@ -35,7 +36,7 @@ public class MainApp extends Application {
 
 	@Override
 	public void start(Stage stage) {
-		stage.setTitle("Festival administration of volunteers");
+		stage.setTitle("Andeby bank");
 		GridPane pane = new GridPane();
 		this.initContent(pane);
 
@@ -50,8 +51,9 @@ public class MainApp extends Application {
 			txfSaldo, txfLåneret;
 	private ToggleGroup tggKontotype;
 	private RadioButton rbnLøn, rbnPrioritet;
-	private Button btnOpretKunde, btnOpretKonto;
-	private Label lblErrorOpretKunde, lblErrorOpretKonto;
+	private Button btnOpretKunde, btnOpretKonto, btnSletKunde, btnTransaktioner, btnKonti, btnAfdelinger;
+	private Label lblErrorKunde, lblErrorKonto;
+	private ListView<String> lvwData;
 
 	private void initContent(GridPane pane) {
 		pane.setPadding(new Insets(10));
@@ -99,6 +101,20 @@ public class MainApp extends Application {
 		txfBynavn.setDisable(true);
 		pane.add(txfBynavn, 1, 3);
 
+		// Kunde knapper
+		HBox hbxKundeKnapper = new HBox();
+
+		btnOpretKunde = new Button("Opret Kunde");
+		hbxKundeKnapper.getChildren().add(btnOpretKunde);
+		btnOpretKunde.setOnAction(e -> opretKundeAction());
+
+		btnSletKunde = new Button("Slet Kunde");
+		hbxKundeKnapper.getChildren().add(btnSletKunde);
+		btnSletKunde.setOnAction(e -> sletKundeAction());
+
+		hbxKundeKnapper.setSpacing(10);
+		pane.add(hbxKundeKnapper, 0, 5, 2, 1);
+
 		// REG. NUMMER
 		HBox hbxRegNr = new HBox();
 
@@ -113,7 +129,7 @@ public class MainApp extends Application {
 
 		hbxRegNr.setSpacing(10);
 		//		hbxRegNr.setPadding(new Insets(20, 0, 0, 0));
-		pane.add(hbxRegNr, 0, 5, 2, 1);
+		pane.add(hbxRegNr, 0, 6, 2, 1);
 
 		// KONTONUMMER
 		HBox hbxKontonummer = new HBox();
@@ -127,18 +143,18 @@ public class MainApp extends Application {
 		hbxKontonummer.getChildren().add(txfKontonummer);
 
 		hbxKontonummer.setSpacing(5);
-		pane.add(hbxKontonummer, 0, 6, 2, 1);
+		pane.add(hbxKontonummer, 0, 7, 2, 1);
 
 		// KONTOTEKST
 		txfKontotekst = new TextField();
-		pane.add(txfKontotekst, 0, 7, 2, 1);
+		pane.add(txfKontotekst, 0, 8, 2, 1);
 
 		// SALDO
 		Label lblSaldo = new Label("Saldo");
-		pane.add(lblSaldo, 0, 8);
+		pane.add(lblSaldo, 0, 9);
 
 		txfSaldo = new TextField();
-		pane.add(txfSaldo, 1, 8);
+		pane.add(txfSaldo, 1, 9);
 
 		// KONTOTYPE
 		HBox hbxKontotype = new HBox();
@@ -153,43 +169,76 @@ public class MainApp extends Application {
 		hbxKontotype.getChildren().add(rbnPrioritet);
 
 		hbxKontotype.setSpacing(10);
-		pane.add(hbxKontotype, 0, 9, 2, 1);
+		pane.add(hbxKontotype, 0, 10, 2, 1);
 
 		// LÅNERET
 		Label lblLåneret = new Label("Låneret");
-		pane.add(lblLåneret, 0, 10);
+		pane.add(lblLåneret, 0, 11);
 
 		txfLåneret = new TextField();
-		pane.add(txfLåneret, 1, 10);
+		pane.add(txfLåneret, 1, 11);
 
-		// OPRET KNAPPER
-		HBox hbxOpret = new HBox();
-
-		btnOpretKunde = new Button("Opret Kunde");
-		hbxOpret.getChildren().add(btnOpretKunde);
-		btnOpretKunde.setOnAction(e -> opretKundeAction());
+		// KONTO KNAPPER
+		HBox hbxKontoKnapper = new HBox();
 
 		btnOpretKonto = new Button("Opret Konto");
-		hbxOpret.getChildren().add(btnOpretKonto);
+		hbxKontoKnapper.getChildren().add(btnOpretKonto);
 		btnOpretKonto.setOnAction(e -> opretKontoAction());
-
-		hbxOpret.setSpacing(10);
-		pane.add(hbxOpret, 0, 12, 2, 1);
+		hbxKontoKnapper.setSpacing(10);
+		pane.add(hbxKontoKnapper, 0, 13, 2, 1);
 
 		// FEJLBESKEDER
-		lblErrorOpretKunde = new Label();
-		lblErrorOpretKunde.setTextFill(Color.RED);
-		pane.add(lblErrorOpretKunde, 0, 4, 2, 1);
+		lblErrorKunde = new Label();
+		lblErrorKunde.setTextFill(Color.RED);
+		pane.add(lblErrorKunde, 0, 4, 2, 1);
 
-		lblErrorOpretKonto = new Label();
-		lblErrorOpretKonto.setTextFill(Color.RED);
-		pane.add(lblErrorOpretKonto, 0, 11, 2, 1);
+		lblErrorKonto = new Label();
+		lblErrorKonto.setTextFill(Color.RED);
+		pane.add(lblErrorKonto, 0, 12, 2, 1);
+
+		// LISTVIEW
+		lvwData = new ListView<>();
+		lvwData.setPrefWidth(400);
+		lvwData.setPrefHeight(400);
+		pane.add(lvwData, 2, 0, 1, 12);
+
+		// KNAPPER TIL LISTVIEW
+		HBox hbxListView = new HBox();
+
+		btnTransaktioner = new Button("Vis transaktioner");
+		hbxListView.getChildren().add(btnTransaktioner);
+		btnTransaktioner.setOnAction(e -> Storage.visTransaktioner());
+
+		btnKonti = new Button("Vis konti");
+		hbxListView.getChildren().add(btnKonti);
+		btnKonti.setOnAction(e -> Storage.visKonti());
+
+		btnAfdelinger = new Button("Vis afdelinger");
+		hbxListView.getChildren().add(btnAfdelinger);
+		btnAfdelinger.setOnAction(e -> Storage.visAfdelinger());
+
+		hbxListView.setSpacing(10);
+		hbxListView.setAlignment(Pos.CENTER);
+		pane.add(hbxListView, 2, 13, 2, 1);
+
+	}
+
+	private void sletKundeAction() {
+		lblErrorKonto.setTextFill(Color.RED);
+
+		String cprNummer = checkCprNummer(lblErrorKunde);
+		if (cprNummer.length() == 10) {
+			Storage.sletKunde(cprNummer);
+			lblErrorKunde.setTextFill(Color.BLACK);
+			lblErrorKunde.setText("Kunde blev slettet succesfuldt.");
+		}
+
 	}
 
 	private void opretKontoAction() {
-		lblErrorOpretKonto.setTextFill(Color.RED);
+		lblErrorKonto.setTextFill(Color.RED);
 
-		String cprNummer = checkCprNummer(lblErrorOpretKonto);
+		String cprNummer = checkCprNummer(lblErrorKonto);
 		String kontotekst = txfKontotekst.getText().trim();
 		boolean løn = rbnLøn.isSelected() ? true : false;
 		boolean prioritet = rbnPrioritet.isSelected() ? true : false;
@@ -199,7 +248,7 @@ public class MainApp extends Application {
 			String temp = txfSaldo.getText().trim();
 			saldo = temp.length() == 0 ? 0 : Double.parseDouble(temp);
 		} catch (Exception e) {
-			lblErrorOpretKonto.setText("Ugyldig saldo.");
+			lblErrorKonto.setText("Ugyldig saldo.");
 		}
 
 		double låneret = -1;
@@ -207,7 +256,7 @@ public class MainApp extends Application {
 			String temp = txfLåneret.getText().trim();
 			låneret = temp.length() == 0 ? 0 : Double.parseDouble(temp);
 		} catch (Exception e) {
-			lblErrorOpretKonto.setText("Ugyldig saldo.");
+			lblErrorKonto.setText("Ugyldig saldo.");
 		}
 
 		int regNummer = -1;
@@ -215,7 +264,7 @@ public class MainApp extends Application {
 			String temp = txfRegNr.getText().trim();
 			regNummer = Integer.parseInt(temp);
 		} catch (Exception e) {
-			lblErrorOpretKonto.setText("Ugyldig reg. nummer.");
+			lblErrorKonto.setText("Ugyldig reg. nummer.");
 		}
 
 		long kontonummer = -1;
@@ -223,30 +272,30 @@ public class MainApp extends Application {
 			String temp = txfKontonummer.getText().trim();
 			kontonummer = Long.parseLong(temp);
 		} catch (Exception e) {
-			lblErrorOpretKonto.setText("Ugyldig kontonummer.");
+			lblErrorKonto.setText("Ugyldig kontonummer.");
 		}
 
 		if (cprNummer.length() != 10) {
-			lblErrorOpretKonto.setText("Ugyldigt CPR-nummer.");
+			lblErrorKonto.setText("Ugyldigt CPR-nummer.");
 		} else if (!Storage.findesKunde(cprNummer)) {
-			lblErrorOpretKonto.setText("Kunde findes ikke.");
+			lblErrorKonto.setText("Kunde findes ikke.");
 		} else if (!Storage.findesAfdelig(regNummer)) {
-			lblErrorOpretKonto.setText("Afdeling findes ikke (indtast et andet reg. nummer).");
+			lblErrorKonto.setText("Afdeling findes ikke (indtast et andet reg. nummer).");
 		} else if (Storage.findesKontoIAfdeling(regNummer, kontonummer)) {
-			lblErrorOpretKonto.setText("Der findes allerede en konto med dette kontonummer i denne afdeling.");
+			lblErrorKonto.setText("Der findes allerede en konto med dette kontonummer i denne afdeling.");
 		} else {
 			Storage.opretKonto(cprNummer, regNummer, kontonummer, kontotekst, saldo, løn, prioritet, låneret);
-			lblErrorOpretKonto.setTextFill(Color.BLACK);
-			lblErrorOpretKonto.setText("Kunde blev oprettet succesfuldt.");
+			lblErrorKonto.setTextFill(Color.BLACK);
+			lblErrorKonto.setText("Kunde blev oprettet succesfuldt.");
 		}
-		lblErrorOpretKunde.setText("");
+		lblErrorKunde.setText("");
 
 	}
 
 	private void opretKundeAction() {
-		lblErrorOpretKunde.setTextFill(Color.RED);
+		lblErrorKunde.setTextFill(Color.RED);
 
-		String cprNummer = checkCprNummer(lblErrorOpretKunde);
+		String cprNummer = checkCprNummer(lblErrorKunde);
 		String navn = txfNavn.getText().trim();
 		String adresse = txfAdresse.getText().trim();
 		int postNr = -1;
@@ -256,17 +305,17 @@ public class MainApp extends Application {
 		}
 
 		if (cprNummer.length() != 10) {
-			lblErrorOpretKunde.setText("Ugyldigt CPR-nummer.");
+			lblErrorKunde.setText("Ugyldigt CPR-nummer.");
 		} else if (txfBynavn.getText().equals("")) {
-			lblErrorOpretKunde.setText("Ugyldigt postnummer.");
+			lblErrorKunde.setText("Ugyldigt postnummer.");
 		} else if (Storage.findesKunde(cprNummer)) {
-			lblErrorOpretKunde.setText("Kunde findes allerede.");
+			lblErrorKunde.setText("Kunde findes allerede.");
 		} else {
 			Storage.opretKunde(cprNummer, navn, adresse, postNr);
-			lblErrorOpretKunde.setTextFill(Color.BLACK);
-			lblErrorOpretKunde.setText("Kunde blev oprettet succesfuldt.");
+			lblErrorKunde.setTextFill(Color.BLACK);
+			lblErrorKunde.setText("Kunde blev oprettet succesfuldt.");
 		}
-		lblErrorOpretKonto.setText("");
+		lblErrorKonto.setText("");
 	}
 
 	private String checkCprNummer(Label label) {
