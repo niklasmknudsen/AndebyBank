@@ -207,15 +207,15 @@ public class MainApp extends Application {
 
 		btnTransaktioner = new Button("Vis transaktioner");
 		hbxListView.getChildren().add(btnTransaktioner);
-		btnTransaktioner.setOnAction(e -> Storage.visTransaktioner());
+		btnTransaktioner.setOnAction(e -> Storage.visTransaktioner(lvwData));
 
 		btnKonti = new Button("Vis konti");
 		hbxListView.getChildren().add(btnKonti);
-		btnKonti.setOnAction(e -> Storage.visKonti());
+		btnKonti.setOnAction(e -> Storage.visKonti(lvwData));
 
 		btnAfdelinger = new Button("Vis afdelinger");
 		hbxListView.getChildren().add(btnAfdelinger);
-		btnAfdelinger.setOnAction(e -> Storage.visAfdelinger());
+		btnAfdelinger.setOnAction(e -> Storage.visAfdelinger(lvwData));
 
 		hbxListView.setSpacing(10);
 		hbxListView.setAlignment(Pos.CENTER);
@@ -224,14 +224,19 @@ public class MainApp extends Application {
 	}
 
 	private void sletKundeAction() {
-		lblErrorKonto.setTextFill(Color.RED);
-
+		lblErrorKunde.setTextFill(Color.RED);
 		String cprNummer = checkCprNummer(lblErrorKunde);
-		if (cprNummer.length() == 10) {
+
+		if (cprNummer.length() != 10) {
+			lblErrorKunde.setText("Ugyldigt CPR-nummer.");
+		} else if (!Storage.findesKunde(cprNummer)) {
+			lblErrorKunde.setText("Kunde findes ikke.");
+		} else {
 			Storage.sletKunde(cprNummer);
 			lblErrorKunde.setTextFill(Color.BLACK);
 			lblErrorKunde.setText("Kunde blev slettet succesfuldt.");
 		}
+		lblErrorKonto.setText("");
 
 	}
 
@@ -249,6 +254,7 @@ public class MainApp extends Application {
 			saldo = temp.length() == 0 ? 0 : Double.parseDouble(temp);
 		} catch (Exception e) {
 			lblErrorKonto.setText("Ugyldig saldo.");
+			return;
 		}
 
 		double låneret = -1;
@@ -257,6 +263,7 @@ public class MainApp extends Application {
 			låneret = temp.length() == 0 ? 0 : Double.parseDouble(temp);
 		} catch (Exception e) {
 			lblErrorKonto.setText("Ugyldig saldo.");
+			return;
 		}
 
 		int regNummer = -1;
@@ -264,15 +271,21 @@ public class MainApp extends Application {
 			String temp = txfRegNr.getText().trim();
 			regNummer = Integer.parseInt(temp);
 		} catch (Exception e) {
-			lblErrorKonto.setText("Ugyldig reg. nummer.");
+			lblErrorKonto.setText("Ugyldigt reg. nummer.");
+			return;
 		}
 
 		long kontonummer = -1;
 		try {
 			String temp = txfKontonummer.getText().trim();
+			if (temp.length() == 0) {
+				throw new IllegalArgumentException();
+			}
 			kontonummer = Long.parseLong(temp);
+
 		} catch (Exception e) {
-			lblErrorKonto.setText("Ugyldig kontonummer.");
+			lblErrorKonto.setText("Ugyldigt kontonummer.");
+			return;
 		}
 
 		if (cprNummer.length() != 10) {
@@ -286,7 +299,7 @@ public class MainApp extends Application {
 		} else {
 			Storage.opretKonto(cprNummer, regNummer, kontonummer, kontotekst, saldo, løn, prioritet, låneret);
 			lblErrorKonto.setTextFill(Color.BLACK);
-			lblErrorKonto.setText("Kunde blev oprettet succesfuldt.");
+			lblErrorKonto.setText("Konto blev oprettet succesfuldt.");
 		}
 		lblErrorKunde.setText("");
 
