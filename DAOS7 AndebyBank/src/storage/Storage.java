@@ -185,7 +185,7 @@ public class Storage {
 				String regNr = rs.getString("regNr");
 				String ktoNr = rs.getString("navn");
 				String samletTransaktioner = Integer.toString(rs.getInt(3));
-				String data = String.format("%1$10s %2$50s %3$30s", regNr, ktoNr, samletTransaktioner);
+				String data = String.format("%1$-10.10s %2$-50.50s %3$-30.30s", regNr, ktoNr, samletTransaktioner);
 				lvw.getItems().add(data);
 			}
 
