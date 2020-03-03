@@ -149,7 +149,7 @@ public class Storage {
 			lvw.getItems().clear();
 			ResultSet rs = myStatement.executeQuery(
 					"select mv.afdelingsnavn, mv.navn, mv.titel, mv.adresse, mv.postNr, mv.bynavn from viewAfdelingsOplysninger as mv join Afdeling A on A.postNr = mv.postNr order by A.regNr;");
-			String titler = String.format("%1$30.30s %2$30.30s %3$30.30s %4$30.30s %5$30.30s %6$30.30s",
+			String titler = String.format("%1$-50.50s %2$-50.50s %3$-50.50s %4$-50.50s %5$-50.50s %6$-50.50s",
 					"Afdelingsnavn", "Navn",
 					"Titel",
 					"Adresse", "Postnr.", "Bynavn");
@@ -161,7 +161,8 @@ public class Storage {
 				String adresse = rs.getString("adresse");
 				String postnr = Integer.toString(rs.getInt("postNr"));
 				String bynavn = rs.getString("bynavn");
-				String data = String.format("%1$30.30s %2$30.30s %3$30.30s %4$30.30s %5$30.30s %6$30.30s", afd, navn,
+				String data = String.format("%1$-50.50s %2$-50.50s %3$-50.50s %4$-50.50s %5$-50.50s %6$-50.50s", afd,
+						navn,
 						titel,
 						adresse, postnr, bynavn);
 				lvw.getItems().add(data);
